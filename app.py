@@ -8,7 +8,7 @@ import uuid
 
 app = Flask(__name__)
 
-YOUTUBE_COOKIES = "__Secure-YNID=13.YT=Jkg0SXBKvrrT-XJS7XLc6BLgoAnhYBiaL4Dn6YPXqjxUVSxByT-l62c19MNQsmNeycItgBeXYAgGE4oxsoAnZ-urRqaYUpSl_Nt0slZ1Qqgu68u_kDOnIufobqBP1GVPBbDmaUPD8poNw2EalIksY-WlwVIfdttllzFBHpUAvx7wvTvyG_E-84Zg-pWL7Yrwd1jz8wGDL-YHQBknTSL6SuoEE0G7w4P7WF-5Ua8IuNtov5wzJuAO3kOnK3ddMsxIb1eJKj8F8l32gNuL6rsL1AGRtyQ6CP7avkih10ldSKGx64lyqf2W38iGdi4h7RwrjpLerl5Y9k0Vr86Ui9iZJQ; YSC=oUhngLIFCWo; VISITOR_INFO1_LIVE=2L8cVCCuRGs; VISITOR_PRIVACY_METADATA=CgJQSxIEGgAgNQ%3D%3D; VISITOR_INFO1_LIVE=2L8cVCCuRGs; VISITOR_PRIVACY_METADATA=CgJQSxIEGgAgNQ%3D%3D; __Secure-1PSIDTS=sidts-CjQBwQ9iI9fswdyNcfpuSMEtQQEV3z1UmSqhPISIWiUbHEcqpF3tkTuT5NvIWAVP0pIbH77HEAA; __Secure-3PSIDTS=sidts-CjQBwQ9iI9fswdyNcfpuSMEtQQEV3z1UmSqhPISIWiUbHEcqpF3tkTuT5NvIWAVP0pIbH77HEAA; __Secure-3PAPISID=F51XTRZi6unq_cWQ/A9jQ53W-CvZsBV_yD; __Secure-3PSID=g.a0003Qjfd0T69Q9L0kVRT7ygUusNVHl5N3MeSgvq-tw_S8r0pZLRv645_ZmbEi6xupub8VVWFQACgYKAeISARUSFQHGX2Mib6jLchg-nZ21mtRzXQrPTRoVAUF8yKrkr51jnMTdldIC1LHJEMvX0076; LOGIN_INFO=AFmmF2swRAIgEcknGtlOz5SE_xHlJW88_Bv-SrxoAGdESc6UtWfk428CIEckjC2WIBIBX3-snwfRusRHoJbh3aUQc5btNAyaZxdw:QUQ3MjNmellhZng0eURUVU5ZUEtMcEsta1VPbHgzTDVzRHQ4ZnEtXzVMX2lEUl9jUHVIYU9NSzZtUU1GZU9TTVh4U19Sa3NpYmtmUzBCdDFmeUlsd1VoVmV5RFUxNWhGM01DV0xtbmZCemRxR01KZThJdDJKWkJrcTZxSWNGVTZPVHllYmQtR3A1SmFlQ3lQcS1FRkNGSktzZVdUX08wLWdn; PREF=f4=4000000&f6=40000000&tz=Asia.Karachi&f7=100; __Secure-ROLLOUT_TOKEN=CIqKztuHvPuDFBCDn73Ms-yQAxjK99XujaeRAw%3D%3D; __Secure-3PSIDCC=AKEyXzVUgDi3PVCGnbsXrX5OKQkv4rdxFEnFgDpZSoMSCCLT6YwE2mLSZTSYkDjZkQTdGmrzUQ"
+YOUTUBE_COOKIES = "__Secure-1PSIDTS=sidts-CjUB7I_69FxHW2QCiA4MxMN3cOdtRC92m5e79NG729hrvN-u7yf2XHnEUj6EMclRyCa2ny1AdBAA; __Secure-3PSIDTS=sidts-CjUB7I_69FxHW2QCiA4MxMN3cOdtRC92m5e79NG729hrvN-u7yf2XHnEUj6EMclRyCa2ny1AdBAA; HSID=Axvvi7FadBeeCoEkp; SSID=As1unpmenzygkSXVV; APISID=59zjzUgQktgx33dq/AAOi3y4BYyIC72S-6; SAPISID=LiKWq-8gQME3PYNf/A0xqExwiRrW7Gl1oi; __Secure-1PAPISID=LiKWq-8gQME3PYNf/A0xqExwiRrW7Gl1oi; __Secure-3PAPISID=LiKWq-8gQME3PYNf/A0xqExwiRrW7Gl1oi; SID=g.a0005wjQsplZsjkxOo5-mAeXeKE0W1wyrgl3mGjjVkRp9zcJQYLwl8a1NBOcm4e0OIHjQupXegACgYKAX0SARESFQHGX2MiNz_hpzfNW07XmFPfSEZJJxoVAUF8yKp-UkljsQgpIq__3lRC_6jH0076; __Secure-1PSID=g.a0005wjQsplZsjkxOo5-mAeXeKE0W1wyrgl3mGjjVkRp9zcJQYLwzgIGckwk68KATq2EJ93fqgACgYKAQwSARESFQHGX2MiouSgqy9S8yGfvSY5GTyDlBoVAUF8yKo77IK6heNTP55gviNrP4dC0076; __Secure-3PSID=g.a0005wjQsplZsjkxOo5-mAeXeKE0W1wyrgl3mGjjVkRp9zcJQYLwhnWLSc3DBpeVigBTfQ5HCgACgYKAV8SARESFQHGX2Miv0afKeDsv9PLSPy8dnoimhoVAUF8yKrhh4xLrzl_FfKuJhCAH1xK0076; __Secure-YNID=15.YT=VzqodTPSls3c8rbOYwmoHXYUq3V9lQjo5ipqIkk5A8rDsPkLQDGvVHRs7gmsZRl99CKkPpLIJMkBTi_9iEXjGOrN-3YcqwvOcRVfpvdyTpes69t-THuRf4Lg9WpG7VUbHVDQSoddQq4ilWb68mICAr849urd8UmB1A9PmOKfYf2pQ6iFjF64yhcYYGLAd4A2lb3OFCS1zeY4YKp3DSWNwYTnBpLb4KxM6IKKoz9-HVOUPigE0CHwnBr_4VNQupKHsIIsbkg3eaojpfUNNw8OpbipzKAGR78kaFMgeZ592OvpuJSF2NRfyHpTLSlxdpqkylkNwPgiJ876N_wQjFaWlA; YSC=NPJ_EOYiux4; __Secure-ROLLOUT_TOKEN=CO3Ox7-pgp5wEIb97eull5IDGIb97eull5ID; VISITOR_INFO1_LIVE=7YzMqpAepms; VISITOR_PRIVACY_METADATA=CgJQSxIEGgAgZQ%3D%3D; PREF=f6=40000000&tz=Asia.Karachi&f7=100; SIDCC=AKEyXzXQxXusP9rqyMwA1JeNVGdnIKvJkp7DEMH-vP-xAJqpA4yj9EW-_KpjPXCBvzXF2cOYZA; __Secure-1PSIDCC=AKEyXzV2Poua5qSYvGa1ODkLMljUr0Zh1CA3d_4V1IkYx8H25V31O8cOrSrZd8pEOGzmv2iJHA; __Secure-3PSIDCC=AKEyXzWsm2eM6TPPFzP9NEDtY5F0BG5cIU7o-R43bCs_13CLoVCBcOFckI42x13SRB6ayK2I"
 
 TIKTOK_HEADERS = {
     'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1',
@@ -26,13 +26,15 @@ def create_cookie_file():
     cookies = YOUTUBE_COOKIES.split('; ')
     for cookie in cookies:
         if '=' in cookie:
-            name, value = cookie.split('=', 1)
+            parts = cookie.split('=', 1)
+            name = parts[0]
+            value = parts[1]
             cookie_file.write(f".youtube.com\tTRUE\t/\tTRUE\t2147483647\t{name}\t{value}\n")
     
     cookie_file.close()
     return cookie_file.name
 
-def get_yt_dlp_options(format_type, output_path):
+def get_yt_dlp_options(format_type, output_path, quality='best'):
     cookie_file = create_cookie_file()
     
     base_options = {
@@ -46,17 +48,20 @@ def get_yt_dlp_options(format_type, output_path):
     
     if format_type == 'audio':
         base_options.update({
-            'format': 'worstaudio/worst',
+            'format': 'bestaudio/best',
             'postprocessors': [{
                 'key': 'FFmpegExtractAudio',
                 'preferredcodec': 'mp3',
-                'preferredquality': '64',
+                'preferredquality': quality if quality and quality != 'best' else '128',
             }],
         })
     elif format_type == 'video':
-        base_options.update({
-            'format': 'best[height<=360]/worst',
-        })
+        if quality == '360':
+            base_options.update({'format': 'best[height<=360]/best'})
+        elif quality == '720':
+            base_options.update({'format': 'best[height<=720]/best'})
+        else:
+            base_options.update({'format': 'best'})
     
     return base_options, cookie_file
 
@@ -71,8 +76,10 @@ def youtube_audio():
     if request.method == 'POST':
         data = request.get_json()
         url = data.get('url') if data else None
+        quality = data.get('quality', '64') if data else '64'
     else:
         url = request.args.get('url')
+        quality = request.args.get('quality', '64')
     
     if not url:
         return jsonify({'error': 'URL is required', 'success': False}), 400
@@ -82,7 +89,7 @@ def youtube_audio():
         unique_id = str(uuid.uuid4())[:8]
         output_path = os.path.join(temp_dir, f'audio_{unique_id}.%(ext)s')
         
-        options, cookie_file = get_yt_dlp_options('audio', output_path)
+        options, cookie_file = get_yt_dlp_options('audio', output_path, quality)
         
         with yt_dlp.YoutubeDL(options) as ydl:
             info = ydl.extract_info(url, download=True)
@@ -121,8 +128,10 @@ def youtube_video():
     if request.method == 'POST':
         data = request.get_json()
         url = data.get('url') if data else None
+        quality = data.get('quality', 'best') if data else 'best'
     else:
         url = request.args.get('url')
+        quality = request.args.get('quality', 'best')
     
     if not url:
         return jsonify({'error': 'URL is required', 'success': False}), 400
@@ -132,7 +141,7 @@ def youtube_video():
         unique_id = str(uuid.uuid4())[:8]
         output_path = os.path.join(temp_dir, f'video_{unique_id}.%(ext)s')
         
-        options, cookie_file = get_yt_dlp_options('video', output_path)
+        options, cookie_file = get_yt_dlp_options('video', output_path, quality)
         
         with yt_dlp.YoutubeDL(options) as ydl:
             info = ydl.extract_info(url, download=True)

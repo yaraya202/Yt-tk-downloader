@@ -21,19 +21,13 @@
                     <span class="method get">GET/POST</span>
                     <code>/api/youtube/audio</code>
                 </div>
-                <p class="description">Download YouTube audio in low quality MP3 format (64kbps)</p>
+                <p class="description">Download YouTube audio in selected quality (64kbps default)</p>
                 <div class="params">
                     <strong>Parameters:</strong>
                     <ul>
                         <li><code>url</code> (required) - YouTube video URL</li>
+                        <li><code>quality</code> (optional) - Audio quality: 64, 128, 192, 256, 320 (default 64)</li>
                     </ul>
-                </div>
-                <div class="example">
-                    <strong>Example:</strong>
-                    <pre>GET /api/youtube/audio?url=https://youtu.be/VIDEO_ID</pre>
-                    <pre>POST /api/youtube/audio
-Content-Type: application/json
-{"url": "https://youtu.be/VIDEO_ID"}</pre>
                 </div>
             </div>
 
@@ -42,102 +36,13 @@ Content-Type: application/json
                     <span class="method get">GET/POST</span>
                     <code>/api/youtube/video</code>
                 </div>
-                <p class="description">Download YouTube video in 360p quality</p>
+                <p class="description">Download YouTube video in selected quality</p>
                 <div class="params">
                     <strong>Parameters:</strong>
                     <ul>
                         <li><code>url</code> (required) - YouTube video URL</li>
+                        <li><code>quality</code> (optional) - Video quality: 360, 720, best (default best)</li>
                     </ul>
-                </div>
-                <div class="example">
-                    <strong>Example:</strong>
-                    <pre>GET /api/youtube/video?url=https://youtu.be/VIDEO_ID</pre>
-                    <pre>POST /api/youtube/video
-Content-Type: application/json
-{"url": "https://youtu.be/VIDEO_ID"}</pre>
-                </div>
-            </div>
-
-            <div class="endpoint-card">
-                <div class="endpoint-header">
-                    <span class="method get">GET/POST</span>
-                    <code>/api/youtube/info</code>
-                </div>
-                <p class="description">Get YouTube video information without downloading</p>
-                <div class="params">
-                    <strong>Parameters:</strong>
-                    <ul>
-                        <li><code>url</code> (required) - YouTube video URL</li>
-                    </ul>
-                </div>
-                <div class="example">
-                    <strong>Response:</strong>
-                    <pre>{
-    "success": true,
-    "title": "Video Title",
-    "duration": 180,
-    "thumbnail": "https://...",
-    "uploader": "Channel Name",
-    "view_count": 1000000
-}</pre>
-                </div>
-            </div>
-
-            <div class="endpoint-card">
-                <div class="endpoint-header">
-                    <span class="method get">GET/POST</span>
-                    <code>/api/tiktok/download</code>
-                </div>
-                <p class="description">Download TikTok video</p>
-                <div class="params">
-                    <strong>Parameters:</strong>
-                    <ul>
-                        <li><code>url</code> (required) - TikTok video URL</li>
-                    </ul>
-                </div>
-                <div class="example">
-                    <strong>Example:</strong>
-                    <pre>GET /api/tiktok/download?url=https://vt.tiktok.com/XXXXX</pre>
-                    <pre>POST /api/tiktok/download
-Content-Type: application/json
-{"url": "https://vt.tiktok.com/XXXXX"}</pre>
-                </div>
-            </div>
-
-            <div class="endpoint-card">
-                <div class="endpoint-header">
-                    <span class="method get">GET/POST</span>
-                    <code>/api/tiktok/info</code>
-                </div>
-                <p class="description">Get TikTok video information without downloading</p>
-                <div class="params">
-                    <strong>Parameters:</strong>
-                    <ul>
-                        <li><code>url</code> (required) - TikTok video URL</li>
-                    </ul>
-                </div>
-                <div class="example">
-                    <strong>Response:</strong>
-                    <pre>{
-    "success": true,
-    "title": "Video Title",
-    "duration": 30,
-    "thumbnail": "https://...",
-    "uploader": "Username",
-    "view_count": 500000
-}</pre>
-                </div>
-            </div>
-
-            <div class="endpoint-card">
-                <div class="endpoint-header">
-                    <span class="method get">GET</span>
-                    <code>/health</code>
-                </div>
-                <p class="description">Health check endpoint</p>
-                <div class="example">
-                    <strong>Response:</strong>
-                    <pre>{"status": "healthy", "message": "API is running"}</pre>
                 </div>
             </div>
         </section>
@@ -147,10 +52,32 @@ Content-Type: application/json
             
             <div class="test-form">
                 <h3>YouTube Downloader</h3>
-                <input type="text" id="youtube-url" placeholder="Enter YouTube URL" value="https://youtu.be/Qo4IOTAbGAM?si=h079uhTcmzZxsS28">
+                <input type="text" id="youtube-url" placeholder="Enter YouTube URL" value="https://youtu.be/Qo4IOTAbGAM?si=yvVvCQnX7eTLPsGx">
+                
+                <div class="options-group">
+                    <div class="option">
+                        <label for="audio-quality">Audio Quality:</label>
+                        <select id="audio-quality">
+                            <option value="64">64 kbps</option>
+                            <option value="128">128 kbps</option>
+                            <option value="192">192 kbps</option>
+                            <option value="256">256 kbps</option>
+                            <option value="320">320 kbps</option>
+                        </select>
+                    </div>
+                    <div class="option">
+                        <label for="video-quality">Video Quality:</label>
+                        <select id="video-quality">
+                            <option value="360">360p</option>
+                            <option value="720">720p</option>
+                            <option value="best" selected>Best Quality</option>
+                        </select>
+                    </div>
+                </div>
+
                 <div class="button-group">
                     <button onclick="downloadYouTubeAudio()">Download Audio (MP3)</button>
-                    <button onclick="downloadYouTubeVideo()">Download Video (360p)</button>
+                    <button onclick="downloadYouTubeVideo()">Download Video</button>
                     <button onclick="getYouTubeInfo()">Get Info</button>
                 </div>
             </div>
@@ -167,29 +94,8 @@ Content-Type: application/json
             <div id="result" class="result"></div>
         </section>
 
-        <section class="deploy-section">
-            <h2>Render Deployment</h2>
-            <div class="deploy-info">
-                <p>This API is ready for Render deployment. Required files:</p>
-                <ul>
-                    <li><code>requirements.txt</code> - Python dependencies</li>
-                    <li><code>render.yaml</code> - Render configuration</li>
-                </ul>
-                <div class="deploy-steps">
-                    <h4>Deployment Steps:</h4>
-                    <ol>
-                        <li>Push code to GitHub</li>
-                        <li>Connect GitHub repo to Render</li>
-                        <li>Select "Web Service"</li>
-                        <li>Build Command: <code>pip install -r requirements.txt</code></li>
-                        <li>Start Command: <code>gunicorn app:app --bind 0.0.0.0:$PORT</code></li>
-                    </ol>
-                </div>
-            </div>
-        </section>
-
         <footer>
-            <p>Media Downloader API - For educational purposes only</p>
+            <p>Media Downloader API - Updated with high quality support</p>
         </footer>
     </div>
 
@@ -208,23 +114,25 @@ Content-Type: application/json
 
         async function downloadYouTubeAudio() {
             const url = document.getElementById('youtube-url').value;
+            const quality = document.getElementById('audio-quality').value;
             if (!url) {
                 showResult({error: 'Please enter a YouTube URL'}, true);
                 return;
             }
             showLoading();
-            window.location.href = `${BASE_URL}/api/youtube/audio?url=${encodeURIComponent(url)}`;
+            window.location.href = `${BASE_URL}/api/youtube/audio?url=${encodeURIComponent(url)}&quality=${quality}`;
             showResult({message: 'Download started...'});
         }
 
         async function downloadYouTubeVideo() {
             const url = document.getElementById('youtube-url').value;
+            const quality = document.getElementById('video-quality').value;
             if (!url) {
                 showResult({error: 'Please enter a YouTube URL'}, true);
                 return;
             }
             showLoading();
-            window.location.href = `${BASE_URL}/api/youtube/video?url=${encodeURIComponent(url)}`;
+            window.location.href = `${BASE_URL}/api/youtube/video?url=${encodeURIComponent(url)}&quality=${quality}`;
             showResult({message: 'Download started...'});
         }
 

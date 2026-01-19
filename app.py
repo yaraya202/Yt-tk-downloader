@@ -148,6 +148,29 @@ def tiktok_download():
         return jsonify({'error': 'API error'}), 500
     except Exception as e: return jsonify({'error': str(e)}), 500
 
+@app.route('/api/tiktok/audio')
+def tiktok_audio():
+    url = request.args.get('url')
+    if not url: return jsonify({'error': 'URL required'}), 400
+    try:
+        data = requests.get(f"https://tikwm.com/api/?url={url}").json()
+        if data.get('code') == 0:
+            audio_url = data['data']['music']
+            title = data['data'].get('title', 'tiktok_audio')
+            clean_title = re.sub(r'[^\w\s-]', '', title)[:50].strip() or "tiktok_audio"
+            audio_res = requests.get(audio_url, stream=True)
+            temp_dir = tempfile.mkdtemp()
+            audio_path = os.path.join(temp_dir, "audio.mp3")
+            with open(audio_path, 'wb') as f:
+                for chunk in audio_res.iter_content(chunk_size=8192): f.write(chunk)
+            @after_this_request
+            def cleanup(response):
+                shutil.rmtree(temp_dir, ignore_errors=True)
+                return response
+            return send_file(audio_path, as_attachment=True, download_name=f"{clean_title}.mp3", mimetype='audio/mpeg')
+        return jsonify({'error': 'API error'}), 500
+    except Exception as e: return jsonify({'error': str(e)}), 500
+
 @app.route('/health')
 def health():
     return "OK"

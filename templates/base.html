@@ -178,6 +178,12 @@
             if (!url) return alert('Please enter URL');
             window.location.href = `${BASE_URL}/api/tiktok/download?url=${encodeURIComponent(url)}`;
         }
+
+        async function downloadTikTokAudio() {
+            const url = document.getElementById('tiktok-url').value;
+            if (!url) return alert('Please enter URL');
+            window.location.href = `${BASE_URL}/api/tiktok/audio?url=${encodeURIComponent(url)}`;
+        }
     </script>
 </body>
 </html>

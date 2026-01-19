@@ -1,6 +1,8 @@
-import { YouTubeMusic } from '@mks2508/yt-dl';
-import fs from 'fs';
+import { exec } from 'child_process';
+import { promisify } from 'util';
 import path from 'path';
+
+const execPromise = promisify(exec);
 
 async function download() {
     const args = process.argv.slice(2);
@@ -11,26 +13,22 @@ async function download() {
     try {
         console.log(`Fetching data for URL: ${url} (Type: ${type})`);
         
-        let result;
+        let command = '';
         if (type === 'audio') {
-            console.log('Downloading best audio...');
-            result = await YouTubeMusic.downloadBestAudio(url, path.dirname(outputPath));
+            command = `python3 -m yt_dlp -x --audio-format mp3 -o "${outputPath}" "${url}"`;
         } else {
-            console.log('Downloading best video...');
-            result = await YouTubeMusic.downloadBestCombined(url, path.dirname(outputPath));
+            command = `python3 -m yt_dlp -f "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best" -o "${outputPath}" "${url}"`;
         }
 
-        if (result.success) {
-            const downloadedFile = result.data.filePath;
-            if (path.resolve(downloadedFile) !== path.resolve(outputPath)) {
-                fs.renameSync(downloadedFile, outputPath);
-            }
-            console.log('Success');
-            process.exit(0);
-        } else {
-            console.error('Download failed:', result.error);
-            process.exit(1);
+        console.log(`Executing: ${command}`);
+        const { stdout, stderr } = await execPromise(command);
+        
+        if (stderr && !stderr.includes('Extracting') && !stderr.includes('Destination')) {
+            console.error('yt-dlp stderr:', stderr);
         }
+        
+        console.log('Success');
+        process.exit(0);
 
     } catch (error) {
         console.error('Error:', error.message);

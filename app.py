@@ -9,25 +9,26 @@ import re
 
 app = Flask(__name__)
 
-def run_node_downloader(url, type, output_path):
+def run_python_downloader(url, type, output_path):
     try:
         os.makedirs(os.path.dirname(output_path), exist_ok=True)
-        result = subprocess.run(
-            ['node', 'downloader.js', url, type, output_path],
-            capture_output=True,
-            text=True,
-            timeout=300
-        )
-        print("Stdout:", result.stdout)
-        print("Stderr:", result.stderr)
+        COOKIES = os.environ.get('YT_COOKIES', "")
         
-        # Extract title from stdout
-        title = "downloaded_file"
-        title_match = re.search(r'TITLE_START\|(.*?)\|TITLE_END', result.stdout)
-        if title_match:
-            title = title_match.group(1)
+        # Get title
+        title_cmd = ['python3', '-m', 'yt_dlp', '--add-header', f"Cookie:{COOKIES}", '--get-title', '--no-playlist', url]
+        title_result = subprocess.run(title_cmd, capture_output=True, text=True, timeout=30)
+        title = title_result.stdout.strip() or "downloaded_file"
+        title = re.sub(r'[^\w\s-]', '', title)
+        
+        # Download
+        if type == 'audio':
+            cmd = ['python3', '-m', 'yt_dlp', '--add-header', f"Cookie:{COOKIES}", '--no-playlist', '--no-check-certificate', '-x', '--audio-format', 'mp3', '-o', output_path, '--proxy', '', url]
+        else:
+            cmd = ['python3', '-m', 'yt_dlp', '--add-header', f"Cookie:{COOKIES}", '--no-playlist', '--no-check-certificate', '-f', 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best', '-o', output_path, '--proxy', '', url]
             
-        if "Success" in result.stdout:
+        result = subprocess.run(cmd, capture_output=True, text=True, timeout=300)
+        
+        if result.returncode == 0:
             return True, None, title
         return False, result.stderr or result.stdout, title
     except Exception as e:
@@ -110,7 +111,7 @@ def youtube_audio():
     unique_id = uuid.uuid4().hex[:8]
     output_path = os.path.join(temp_dir, f'audio_{unique_id}.mp3')
     
-    success, error, title = run_node_downloader(url, 'audio', output_path)
+    success, error, title = run_python_downloader(url, 'audio', output_path)
     
     if success and os.path.exists(output_path) and os.path.getsize(output_path) > 0:
         @after_this_request
@@ -135,7 +136,7 @@ def youtube_video():
     unique_id = uuid.uuid4().hex[:8]
     output_path = os.path.join(temp_dir, f'video_{unique_id}.mp4')
     
-    success, error, title = run_node_downloader(url, 'video', output_path)
+    success, error, title = run_python_downloader(url, 'video', output_path)
     
     if success and os.path.exists(output_path) and os.path.getsize(output_path) > 0:
         @after_this_request

@@ -7,6 +7,8 @@ import shutil
 import subprocess
 import re
 
+import yt_dlp
+
 app = Flask(__name__)
 
 def run_python_downloader(url, type, output_path):
@@ -14,23 +16,37 @@ def run_python_downloader(url, type, output_path):
         os.makedirs(os.path.dirname(output_path), exist_ok=True)
         COOKIES = os.environ.get('YT_COOKIES', "")
         
-        # Get title
-        title_cmd = ['python3', '-m', 'yt_dlp', '--add-header', f"Cookie:{COOKIES}", '--get-title', '--no-playlist', url]
-        title_result = subprocess.run(title_cmd, capture_output=True, text=True, timeout=30)
-        title = title_result.stdout.strip() or "downloaded_file"
-        title = re.sub(r'[^\w\s-]', '', title)
+        ydl_opts = {
+            'outtmpl': output_path,
+            'no_playlist': True,
+            'nocheckcertificate': True,
+            'quiet': True,
+            'no_warnings': True,
+            'http_headers': {
+                'Cookie': COOKIES
+            }
+        }
         
-        # Download
         if type == 'audio':
-            cmd = ['python3', '-m', 'yt_dlp', '--add-header', f"Cookie:{COOKIES}", '--no-playlist', '--no-check-certificate', '-x', '--audio-format', 'mp3', '-o', output_path, '--proxy', '', url]
+            ydl_opts.update({
+                'format': 'bestaudio/best',
+                'postprocessors': [{
+                    'key': 'FFmpegExtractAudio',
+                    'preferredcodec': 'mp3',
+                    'preferredquality': '192',
+                }],
+            })
         else:
-            cmd = ['python3', '-m', 'yt_dlp', '--add-header', f"Cookie:{COOKIES}", '--no-playlist', '--no-check-certificate', '-f', 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best', '-o', output_path, '--proxy', '', url]
-            
-        result = subprocess.run(cmd, capture_output=True, text=True, timeout=300)
-        
-        if result.returncode == 0:
+            ydl_opts.update({
+                'format': 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best',
+            })
+
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            info = ydl.extract_info(url, download=True)
+            title = info.get('title', 'downloaded_file')
+            title = re.sub(r'[^\w\s-]', '', title)
             return True, None, title
-        return False, result.stderr or result.stdout, title
+            
     except Exception as e:
         return False, str(e), "file"
 
@@ -66,15 +82,19 @@ def get_info():
         # YouTube Cookies (Environment Variable)
         COOKIES = os.environ.get('YT_COOKIES', "")
 
-        result = subprocess.run(
-            ['python3', '-m', 'yt_dlp', '--add-header', f"Cookie:{COOKIES}", '--dump-json', '--no-playlist', '--no-check-certificate', '--proxy', '', normalized_url],
-            capture_output=True, text=True, timeout=30
-        )
-        if result.returncode == 0:
-            import json
-            data = json.loads(result.stdout)
+        ydl_opts = {
+            'no_playlist': True,
+            'nocheckcertificate': True,
+            'quiet': True,
+            'no_warnings': True,
+            'http_headers': {
+                'Cookie': COOKIES
+            }
+        }
+        
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            data = ydl.extract_info(normalized_url, download=False)
             thumbnail = data.get('thumbnail')
-            # If thumbnail is a .webp or has issues, we can try to get the maxresdefault
             video_id = data.get('id')
             if video_id and (not thumbnail or '.webp' in thumbnail):
                 thumbnail = f"https://img.youtube.com/vi/{video_id}/maxresdefault.jpg"
@@ -84,8 +104,6 @@ def get_info():
                 'thumbnail': thumbnail,
                 'duration': data.get('duration_string')
             })
-        else:
-            print(f"yt-dlp error: {result.stderr}")
     except Exception as e:
         print(f"Info Error: {e}")
         

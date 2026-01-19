@@ -1,5 +1,4 @@
-const { youtube } = require('priyansh-all-dl');
-const axios = require('axios');
+const { YouTubeMusic } = require('@mks2508/yt-dl');
 const fs = require('fs');
 const path = require('path');
 
@@ -10,53 +9,29 @@ async function download() {
     const outputPath = args[2];
 
     try {
-        console.log(`Fetching data for URL: ${url}`);
-        // Based on the error, ytdown was not found. 
-        // Checking documentation/common patterns for this library, it might be 'youtube' or similar.
-        // I will try 'youtube' method which is common in such all-in-one downloaders.
-        const data = await youtube(url);
+        console.log(`Fetching data for URL: ${url} (Type: ${type})`);
         
-        if (!data || !data.data) {
-            console.error('API Error: No data returned from youtube method');
-            process.exit(1);
-        }
-
-        console.log('API Response received');
-        let downloadUrl = '';
-        
+        let result;
         if (type === 'audio') {
-            downloadUrl = data.data.audio || data.data.mp3;
+            console.log('Downloading best audio...');
+            result = await YouTubeMusic.downloadBestAudio(url, path.dirname(outputPath));
         } else {
-            downloadUrl = data.data.video || data.data.mp4;
+            console.log('Downloading best video...');
+            result = await YouTubeMusic.downloadBestCombined(url, path.dirname(outputPath));
         }
 
-        if (!downloadUrl) {
-            console.error(`Error: No ${type} URL found in API response`);
-            process.exit(1);
-        }
-
-        console.log(`Downloading from: ${downloadUrl}`);
-        const response = await axios({
-            method: 'GET',
-            url: downloadUrl,
-            responseType: 'stream',
-            headers: {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+        if (result.success) {
+            const downloadedFile = result.data.filePath;
+            // Move/Rename to expected outputPath if different
+            if (path.resolve(downloadedFile) !== path.resolve(outputPath)) {
+                fs.renameSync(downloadedFile, outputPath);
             }
-        });
-
-        const writer = fs.createWriteStream(outputPath);
-        response.data.pipe(writer);
-
-        writer.on('finish', () => {
             console.log('Success');
             process.exit(0);
-        });
-
-        writer.on('error', (err) => {
-            console.error('Writer error:', err.message);
+        } else {
+            console.error('Download failed:', result.error);
             process.exit(1);
-        });
+        }
 
     } catch (error) {
         console.error('Error:', error.message);

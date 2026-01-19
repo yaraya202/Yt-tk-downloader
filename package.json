@@ -10,6 +10,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@mks2508/yt-dl": "^1.0.30",
     "axios": "^1.13.2",
     "priyansh-all-dl": "^2.0.2"
   }

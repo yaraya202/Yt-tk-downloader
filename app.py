@@ -5,13 +5,13 @@ import tempfile
 import uuid
 import shutil
 import subprocess
+import re
 
 app = Flask(__name__)
 
 def run_node_downloader(url, type, output_path):
     try:
         os.makedirs(os.path.dirname(output_path), exist_ok=True)
-        # We need to run it as a module since we changed type to module
         result = subprocess.run(
             ['node', 'downloader.js', url, type, output_path],
             capture_output=True,
@@ -21,11 +21,17 @@ def run_node_downloader(url, type, output_path):
         print("Stdout:", result.stdout)
         print("Stderr:", result.stderr)
         
+        # Extract title from stdout
+        title = "downloaded_file"
+        title_match = re.search(r'TITLE_START\|(.*?)\|TITLE_END', result.stdout)
+        if title_match:
+            title = title_match.group(1)
+            
         if "Success" in result.stdout:
-            return True, None
-        return False, result.stderr or result.stdout
+            return True, None, title
+        return False, result.stderr or result.stdout, title
     except Exception as e:
-        return False, str(e)
+        return False, str(e), "file"
 
 @app.route('/')
 def index():
@@ -51,14 +57,14 @@ def youtube_audio():
     unique_id = uuid.uuid4().hex[:8]
     output_path = os.path.join(temp_dir, f'audio_{unique_id}.mp3')
     
-    success, error = run_node_downloader(url, 'audio', output_path)
+    success, error, title = run_node_downloader(url, 'audio', output_path)
     
     if success and os.path.exists(output_path) and os.path.getsize(output_path) > 0:
         @after_this_request
         def cleanup(response):
             shutil.rmtree(temp_dir, ignore_errors=True)
             return response
-        return send_file(output_path, as_attachment=True, download_name="audio.mp3", mimetype='audio/mpeg')
+        return send_file(output_path, as_attachment=True, download_name=f"{title}.mp3", mimetype='audio/mpeg')
     
     shutil.rmtree(temp_dir, ignore_errors=True)
     return jsonify({'error': f"Download failed: {error}"}), 500
@@ -71,14 +77,14 @@ def youtube_video():
     unique_id = uuid.uuid4().hex[:8]
     output_path = os.path.join(temp_dir, f'video_{unique_id}.mp4')
     
-    success, error = run_node_downloader(url, 'video', output_path)
+    success, error, title = run_node_downloader(url, 'video', output_path)
     
     if success and os.path.exists(output_path) and os.path.getsize(output_path) > 0:
         @after_this_request
         def cleanup(response):
             shutil.rmtree(temp_dir, ignore_errors=True)
             return response
-        return send_file(output_path, as_attachment=True, download_name="video.mp4", mimetype='video/mp4')
+        return send_file(output_path, as_attachment=True, download_name=f"{title}.mp4", mimetype='video/mp4')
     
     shutil.rmtree(temp_dir, ignore_errors=True)
     return jsonify({'error': f"Download failed: {error}"}), 500
@@ -91,7 +97,9 @@ def tiktok_download():
         data = requests.get(f"https://tikwm.com/api/?url={url}").json()
         if data.get('code') == 0:
             video_url = data['data']['play']
-            title = data['data'].get('title', 'tiktok')
+            title = data['data'].get('title', 'tiktok_video')
+            # Clean title for filename
+            clean_title = re.sub(r'[^\w\s-]', '', title)[:50].strip() or "tiktok"
             video_res = requests.get(video_url, stream=True)
             temp_dir = tempfile.mkdtemp()
             video_path = os.path.join(temp_dir, "video.mp4")
@@ -101,7 +109,7 @@ def tiktok_download():
             def cleanup(response):
                 shutil.rmtree(temp_dir, ignore_errors=True)
                 return response
-            return send_file(video_path, as_attachment=True, download_name=f"{title[:50]}.mp4", mimetype='video/mp4')
+            return send_file(video_path, as_attachment=True, download_name=f"{clean_title}.mp4", mimetype='video/mp4')
         return jsonify({'error': 'API error'}), 500
     except Exception as e: return jsonify({'error': str(e)}), 500
 

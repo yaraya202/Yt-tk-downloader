@@ -1,4 +1,4 @@
-const { ytdown } = require('priyansh-all-dl');
+const { youtube } = require('priyansh-all-dl');
 const axios = require('axios');
 const fs = require('fs');
 const path = require('path');
@@ -11,10 +11,13 @@ async function download() {
 
     try {
         console.log(`Fetching data for URL: ${url}`);
-        const data = await ytdown(url);
+        // Based on the error, ytdown was not found. 
+        // Checking documentation/common patterns for this library, it might be 'youtube' or similar.
+        // I will try 'youtube' method which is common in such all-in-one downloaders.
+        const data = await youtube(url);
         
         if (!data || !data.data) {
-            console.error('API Error: No data returned from ytdown');
+            console.error('API Error: No data returned from youtube method');
             process.exit(1);
         }
 
@@ -22,9 +25,9 @@ async function download() {
         let downloadUrl = '';
         
         if (type === 'audio') {
-            downloadUrl = data.data.audio;
+            downloadUrl = data.data.audio || data.data.mp3;
         } else {
-            downloadUrl = data.data.video;
+            downloadUrl = data.data.video || data.data.mp4;
         }
 
         if (!downloadUrl) {

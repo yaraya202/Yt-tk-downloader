@@ -49,6 +49,42 @@ def tiktok_page():
 def api_docs():
     return render_template('api.html')
 
+@app.route('/api/info')
+def get_info():
+    url = request.args.get('url')
+    if not url: return jsonify({'error': 'URL required'}), 400
+    
+    # Simple YouTube Info extractor using yt-dlp
+    try:
+        result = subprocess.run(
+            ['python3', '-m', 'yt_dlp', '--dump-json', '--no-playlist', url],
+            capture_output=True, text=True, timeout=30
+        )
+        if result.returncode == 0:
+            import json
+            data = json.loads(result.stdout)
+            return jsonify({
+                'title': data.get('title'),
+                'thumbnail': data.get('thumbnail'),
+                'duration': data.get('duration_string')
+            })
+    except Exception as e:
+        print(f"Info Error: {e}")
+        
+    # TikTok Fallback
+    if 'tiktok' in url:
+        try:
+            data = requests.get(f"https://tikwm.com/api/?url={url}").json()
+            if data.get('code') == 0:
+                return jsonify({
+                    'title': data['data'].get('title'),
+                    'thumbnail': data['data'].get('cover'),
+                    'duration': ''
+                })
+        except: pass
+        
+    return jsonify({'title': 'Unknown Media', 'thumbnail': '', 'duration': ''})
+
 @app.route('/api/youtube/audio')
 def youtube_audio():
     url = request.args.get('url')
@@ -98,7 +134,6 @@ def tiktok_download():
         if data.get('code') == 0:
             video_url = data['data']['play']
             title = data['data'].get('title', 'tiktok_video')
-            # Clean title for filename
             clean_title = re.sub(r'[^\w\s-]', '', title)[:50].strip() or "tiktok"
             video_res = requests.get(video_url, stream=True)
             temp_dir = tempfile.mkdtemp()

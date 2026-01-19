@@ -34,16 +34,18 @@
 
     <div id="result-overlay" class="overlay hidden">
         <div class="modal">
-            <div class="loader-container">
-                <div class="loader"></div>
-                <div class="loader-inner"></div>
+            <div class="video-preview">
+                <div class="thumbnail-box">
+                    <img id="prev-thumb" src="" alt="Thumbnail">
+                </div>
+                <div id="video-title">Fetching Title...</div>
             </div>
-            <div id="status-text">Processing...</div>
-            <div class="status-subtext">This might take a moment depending on the file size.</div>
-            <div class="progress-bar">
-                <div class="progress-bar-fill"></div>
+            <div id="status-text">Starting Download...</div>
+            <div class="progress-container">
+                <div id="progress-fill" class="progress-bar-fill"></div>
             </div>
-            <button class="btn btn-close" onclick="closeModal()">Close</button>
+            <div id="percent-text">0%</div>
+            <button id="close-btn" class="btn btn-close hidden" onclick="closeModal()">Close</button>
         </div>
     </div>
 
@@ -55,38 +57,104 @@
             document.getElementById('nav-list').classList.toggle('active');
         });
 
-        function showLoading(text = "Processing...") {
+        function showOverlay() {
             document.getElementById('result-overlay').classList.remove('hidden');
-            document.getElementById('status-text').innerText = text;
-            document.getElementById('loader').style.display = 'block';
+            document.getElementById('close-btn').classList.add('hidden');
+            updateProgress(0);
+            document.getElementById('status-text').innerText = "Starting Download...";
         }
 
         function closeModal() {
             document.getElementById('result-overlay').classList.add('hidden');
         }
 
+        function updateProgress(p) {
+            document.getElementById('progress-fill').style.width = p + '%';
+            document.getElementById('percent-text').innerText = p + '%';
+        }
+
+        async function startSmartProgress() {
+            let p = 10;
+            updateProgress(p);
+            
+            // Fast 10% to 70%
+            const fastInterval = setInterval(() => {
+                if (p < 70) {
+                    p += Math.floor(Math.random() * 5) + 2;
+                    if (p > 70) p = 70;
+                    updateProgress(p);
+                } else {
+                    clearInterval(fastInterval);
+                    // Slow 70% to 99%
+                    const slowInterval = setInterval(() => {
+                        if (p < 99) {
+                            p += 1;
+                            updateProgress(p);
+                        } else {
+                            clearInterval(slowInterval);
+                        }
+                    }, 1000);
+                }
+            }, 100);
+        }
+
+        async function fetchInfo(url) {
+            try {
+                const res = await fetch(`${BASE_URL}/api/info?url=${encodeURIComponent(url)}`);
+                const data = await res.json();
+                document.getElementById('prev-thumb').src = data.thumbnail || '';
+                document.getElementById('video-title').innerText = data.title || 'Unknown Media';
+                return data;
+            } catch (e) {
+                console.error(e);
+                return null;
+            }
+        }
+
         async function downloadYouTubeAudio() {
             const url = document.getElementById('youtube-url').value;
             if (!url) return alert('Please enter URL');
-            showLoading("Downloading Audio...");
+            showOverlay();
+            await fetchInfo(url);
+            startSmartProgress();
+            
             window.location.href = `${BASE_URL}/api/youtube/audio?url=${encodeURIComponent(url)}`;
-            setTimeout(closeModal, 10000);
+            // Show close button after delay since download start is hard to track perfectly via window.location
+            setTimeout(() => {
+                document.getElementById('status-text').innerText = "Download Started!";
+                updateProgress(100);
+                document.getElementById('close-btn').classList.remove('hidden');
+            }, 10000);
         }
 
         async function downloadYouTubeVideo() {
             const url = document.getElementById('youtube-url').value;
             if (!url) return alert('Please enter URL');
-            showLoading("Downloading Video...");
+            showOverlay();
+            await fetchInfo(url);
+            startSmartProgress();
+            
             window.location.href = `${BASE_URL}/api/youtube/video?url=${encodeURIComponent(url)}`;
-            setTimeout(closeModal, 10000);
+            setTimeout(() => {
+                document.getElementById('status-text').innerText = "Download Started!";
+                updateProgress(100);
+                document.getElementById('close-btn').classList.remove('hidden');
+            }, 15000);
         }
 
         async function downloadTikTok() {
             const url = document.getElementById('tiktok-url').value;
             if (!url) return alert('Please enter URL');
-            showLoading("Downloading TikTok...");
+            showOverlay();
+            await fetchInfo(url);
+            startSmartProgress();
+            
             window.location.href = `${BASE_URL}/api/tiktok/download?url=${encodeURIComponent(url)}`;
-            setTimeout(closeModal, 10000);
+            setTimeout(() => {
+                document.getElementById('status-text').innerText = "Download Started!";
+                updateProgress(100);
+                document.getElementById('close-btn').classList.remove('hidden');
+            }, 8000);
         }
     </script>
 </body>

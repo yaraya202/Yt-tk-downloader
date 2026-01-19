@@ -34,8 +34,15 @@
 
     <div id="result-overlay" class="overlay hidden">
         <div class="modal">
-            <div id="loader" class="loader"></div>
+            <div class="loader-container">
+                <div class="loader"></div>
+                <div class="loader-inner"></div>
+            </div>
             <div id="status-text">Processing...</div>
+            <div class="status-subtext">This might take a moment depending on the file size.</div>
+            <div class="progress-bar">
+                <div class="progress-bar-fill"></div>
+            </div>
             <button class="btn btn-close" onclick="closeModal()">Close</button>
         </div>
     </div>

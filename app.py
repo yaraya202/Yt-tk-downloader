@@ -115,12 +115,17 @@ def youtube_audio():
     if success and os.path.exists(output_path) and os.path.getsize(output_path) > 0:
         @after_this_request
         def cleanup(response):
-            shutil.rmtree(temp_dir, ignore_errors=True)
+            try:
+                if os.path.exists(temp_dir):
+                    shutil.rmtree(temp_dir, ignore_errors=True)
+            except: pass
             return response
         return send_file(output_path, as_attachment=True, download_name=f"{title}.mp3", mimetype='audio/mpeg')
     
+    error_msg = f"Download failed: {error}"
+    print(f"Error for {url}: {error_msg}")
     shutil.rmtree(temp_dir, ignore_errors=True)
-    return jsonify({'error': f"Download failed: {error}"}), 500
+    return jsonify({'error': error_msg}), 500
 
 @app.route('/api/youtube/video')
 def youtube_video():
@@ -135,12 +140,17 @@ def youtube_video():
     if success and os.path.exists(output_path) and os.path.getsize(output_path) > 0:
         @after_this_request
         def cleanup(response):
-            shutil.rmtree(temp_dir, ignore_errors=True)
+            try:
+                if os.path.exists(temp_dir):
+                    shutil.rmtree(temp_dir, ignore_errors=True)
+            except: pass
             return response
         return send_file(output_path, as_attachment=True, download_name=f"{title}.mp4", mimetype='video/mp4')
     
+    error_msg = f"Download failed: {error}"
+    print(f"Error for {url}: {error_msg}")
     shutil.rmtree(temp_dir, ignore_errors=True)
-    return jsonify({'error': f"Download failed: {error}"}), 500
+    return jsonify({'error': error_msg}), 500
 
 @app.route('/api/tiktok/download')
 def tiktok_download():

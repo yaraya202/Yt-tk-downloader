@@ -117,29 +117,52 @@
             showOverlay();
             await fetchInfo(url);
             
+            document.getElementById('status-text').innerText = "Downloading Audio...";
             let p = 0;
-            const duration = 12000; // 12 seconds
-            const intervalTime = 100;
-            const steps = duration / intervalTime;
-            const stepIncrement = 100 / steps;
-
             const progressInterval = setInterval(() => {
-                p += stepIncrement;
-                if (p >= 100) {
-                    p = 100;
-                    updateProgress(100);
-                    clearInterval(progressInterval);
-                    setTimeout(closeModal, 500); // Close after 0.5s of hitting 100%
-                } else {
+                if (p < 95) {
+                    p += Math.random() * 2;
                     updateProgress(Math.floor(p));
                 }
-            }, intervalTime);
+            }, 500);
 
-            const downloadUrl = `${BASE_URL}/api/youtube/audio?url=${encodeURIComponent(url)}`;
-            const iframe = document.createElement('iframe');
-            iframe.style.display = 'none';
-            iframe.src = downloadUrl;
-            document.body.appendChild(iframe);
+            try {
+                const downloadUrl = `${BASE_URL}/api/youtube/audio?url=${encodeURIComponent(url)}`;
+                const response = await fetch(downloadUrl);
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const downloadLink = document.createElement('a');
+                    downloadLink.href = window.URL.createObjectURL(blob);
+                    
+                    // Try to get filename from content-disposition
+                    const disposition = response.headers.get('content-disposition');
+                    let filename = "audio.mp3";
+                    if (disposition && disposition.indexOf('attachment') !== -1) {
+                        const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
+                        const matches = filenameRegex.exec(disposition);
+                        if (matches != null && matches[1]) { 
+                          filename = matches[1].replace(/['"]/g, '');
+                        }
+                    }
+                    
+                    downloadLink.download = filename;
+                    document.body.appendChild(downloadLink);
+                    downloadLink.click();
+                    document.body.removeChild(downloadLink);
+                    
+                    updateProgress(100);
+                    document.getElementById('status-text').innerText = "Download Complete!";
+                } else {
+                    const err = await response.json();
+                    alert("Error: " + (err.error || "Download failed"));
+                }
+            } catch (e) {
+                console.error(e);
+                alert("Download failed. Please check your connection.");
+            } finally {
+                clearInterval(progressInterval);
+                document.getElementById('close-btn').classList.remove('hidden');
+            }
         }
 
         async function downloadYouTubeVideo() {
@@ -148,29 +171,51 @@
             showOverlay();
             await fetchInfo(url);
             
+            document.getElementById('status-text').innerText = "Downloading Video...";
             let p = 0;
-            const duration = 12000; // 12 seconds
-            const intervalTime = 100;
-            const steps = duration / intervalTime;
-            const stepIncrement = 100 / steps;
-
             const progressInterval = setInterval(() => {
-                p += stepIncrement;
-                if (p >= 100) {
-                    p = 100;
-                    updateProgress(100);
-                    clearInterval(progressInterval);
-                    setTimeout(closeModal, 500);
-                } else {
+                if (p < 95) {
+                    p += Math.random() * 1.5;
                     updateProgress(Math.floor(p));
                 }
-            }, intervalTime);
+            }, 800);
 
-            const downloadUrl = `${BASE_URL}/api/youtube/video?url=${encodeURIComponent(url)}`;
-            const iframe = document.createElement('iframe');
-            iframe.style.display = 'none';
-            iframe.src = downloadUrl;
-            document.body.appendChild(iframe);
+            try {
+                const downloadUrl = `${BASE_URL}/api/youtube/video?url=${encodeURIComponent(url)}`;
+                const response = await fetch(downloadUrl);
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const downloadLink = document.createElement('a');
+                    downloadLink.href = window.URL.createObjectURL(blob);
+                    
+                    const disposition = response.headers.get('content-disposition');
+                    let filename = "video.mp4";
+                    if (disposition && disposition.indexOf('attachment') !== -1) {
+                        const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
+                        const matches = filenameRegex.exec(disposition);
+                        if (matches != null && matches[1]) { 
+                          filename = matches[1].replace(/['"]/g, '');
+                        }
+                    }
+
+                    downloadLink.download = filename;
+                    document.body.appendChild(downloadLink);
+                    downloadLink.click();
+                    document.body.removeChild(downloadLink);
+                    
+                    updateProgress(100);
+                    document.getElementById('status-text').innerText = "Download Complete!";
+                } else {
+                    const err = await response.json();
+                    alert("Error: " + (err.error || "Download failed"));
+                }
+            } catch (e) {
+                console.error(e);
+                alert("Download failed. Please check your connection.");
+            } finally {
+                clearInterval(progressInterval);
+                document.getElementById('close-btn').classList.remove('hidden');
+            }
         }
 
         async function downloadTikTok() {

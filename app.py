@@ -9,15 +9,8 @@ import shutil
 
 app = Flask(__name__)
 
-# Hardcoded fresh cookies as requested
+# Hardcoded fresh cookies
 YOUTUBE_COOKIES = "__Secure-1PSIDTS=sidts-CjUB7I_69FxHW2QCiA4MxMN3cOdtRC92m5e79NG729hrvN-u7yf2XHnEUj6EMclRyCa2ny1AdBAA; __Secure-3PSIDTS=sidts-CjUB7I_69FxHW2QCiA4MxMN3cOdtRC92m5e79NG729hrvN-u7yf2XHnEUj6EMclRyCa2ny1AdBAA; HSID=Axvvi7FadBeeCoEkp; SSID=As1unpmenzygkSXVV; APISID=59zjzUgQktgx33dq/AAOi3y4BYyIC72S-6; SAPISID=LiKWq-8gQME3PYNf/A0xqExwiRrW7Gl1oi; __Secure-1PAPISID=LiKWq-8gQME3PYNf/A0xqExwiRrW7Gl1oi; __Secure-3PAPISID=LiKWq-8gQME3PYNf/A0xqExwiRrW7Gl1oi; SID=g.a0005wjQsplZsjkxOo5-mAeXeKE0W1wyrgl3mGjjVkRp9zcJQYLwl8a1NBOcm4e0OIHjQupXegACgYKAX0SARESFQHGX2MiNz_hpzfNW07XmFPfSEZJJxoVAUF8yKp-UkljsQgpIq__3lRC_6jH0076; __Secure-1PSID=g.a0005wjQsplZsjkxOo5-mAeXeKE0W1wyrgl3mGjjVkRp9zcJQYLwzgIGckwk68KATq2EJ93fqgACgYKAQwSARESFQHGX2MiouSgqy9S8yGfvSY5GTyDlBoVAUF8yKo77IK6heNTP55gviNrP4dC0076; __Secure-3PSID=g.a0005wjQsplZsjkxOo5-mAeXeKE0W1wyrgl3mGjjVkRp9zcJQYLwhnWLSc3DBpeVigBTfQ5HCgACgYKAV8SARESFQHGX2Miv0afKeDsv9PLSPy8dnoimhoVAUF8yKrhh4xLrzl_FfKuJhCAH1xK0076; __Secure-YNID=15.YT=VzqodTPSls3c8rbOYwmoHXYUq3V9lQjo5ipqIkk5A8rDsPkLQDGvVHRs7gmsZRl99CKkPpLIJMkBTi_9iEXjGOrN-3YcqwvOcRVfpvdyTpes69t-THuRf4Lg9WpG7VUbHVDQSoddQq4ilWb68mICAr849urd8UmB1A9PmOKfYf2pQ6iFjF64yhcYYGLAd4A2lb3OFCS1zeY4YKp3DSWNwYTnBpLb4KxM6IKKoz9-HVOUPigE0CHwnBr_4VNQupKHsIIsbkg3eaojpfUNNw8OpbipzKAGR78kaFMgeZ592OvpuJSF2NRfyHpTLSlxdpqkylkNwPgiJ876N_wQjFaWlA; YSC=NPJ_EOYiux4; __Secure-ROLLOUT_TOKEN=CO3Ox7-pgp5wEIb97eull5IDGIb97eull5ID; VISITOR_INFO1_LIVE=7YzMqpAepms; VISITOR_PRIVACY_METADATA=CgJQSxIEGgAgZQ%3D%3D; PREF=f6=40000000&tz=Asia.Karachi&f7=100; SIDCC=AKEyXzXQxXusP9rqyMwA1JeNVGdnIKvJkp7DEMH-vP-xAJqpA4yj9EW-_KpjPXCBvzXF2cOYZA; __Secure-1PSIDCC=AKEyXzV2Poua5qSYvGa1ODkLMljUr0Zh1CA3d_4V1IkYx8H25V31O8cOrSrZd8pEOGzmv2iJHA; __Secure-3PSIDCC=AKEyXzWsm2eM6TPPFzP9NEDtY5F0BG5cIU7o-R43bCs_13CLoVCBcOFckI42x13SRB6ayK2I"
-
-TIKTOK_HEADERS = {
-    'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1',
-    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-    'Accept-Language': 'en-US,en;q=0.9',
-    'Referer': 'https://www.tiktok.com/',
-}
 
 def create_cookie_file():
     cookie_file = tempfile.NamedTemporaryFile(mode='w', suffix='.txt', delete=False)
@@ -40,9 +33,10 @@ def get_yt_dlp_options(format_type, output_path, quality='best'):
         'outtmpl': output_path,
         'nocheckcertificate': True,
         'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-        'nopart': True,  # Critical to avoid 'empty file' errors
+        'nopart': True,
         'no_cache_dir': True,
         'ignoreerrors': True,
+        'external_downloader': 'ffmpeg', # Force ffmpeg for better handling
     }
     if format_type == 'audio':
         base_options.update({
@@ -54,9 +48,12 @@ def get_yt_dlp_options(format_type, output_path, quality='best'):
             }],
         })
     elif format_type == 'video':
-        if quality == '360': base_options.update({'format': 'best[height<=360]/best'})
-        elif quality == '720': base_options.update({'format': 'best[height<=720]/best'})
-        else: base_options.update({'format': 'best'})
+        if quality == '360':
+            base_options.update({'format': 'bestvideo[height<=360]+bestaudio/best[height<=360]'})
+        elif quality == '720':
+            base_options.update({'format': 'bestvideo[height<=720]+bestaudio/best[height<=720]'})
+        else:
+            base_options.update({'format': 'bestvideo+bestaudio/best'})
         base_options.update({'merge_output_format': 'mp4'})
     return base_options, cookie_file
 
@@ -77,13 +74,11 @@ def youtube_audio():
             ydl.download([url])
             info = ydl.extract_info(url, download=False)
             title = info.get('title', 'audio')
-        
         final_file = None
         for f in os.listdir(temp_dir):
-            if f.startswith(f'audio_{unique_id}'):
+            if f.startswith(f'audio_{unique_id}') and f.endswith('.mp3'):
                 final_file = os.path.join(temp_dir, f)
                 break
-        
         if final_file and os.path.exists(final_file) and os.path.getsize(final_file) > 0:
             @after_this_request
             def cleanup(response):
@@ -91,7 +86,7 @@ def youtube_audio():
                 if os.path.exists(cookie_file): os.remove(cookie_file)
                 return response
             return send_file(final_file, as_attachment=True, download_name=f"{title}.mp3", mimetype='audio/mpeg')
-        raise Exception("Download failed or file is empty")
+        raise Exception("Download failed - Check your URL or try again later")
     except Exception as e:
         shutil.rmtree(temp_dir, ignore_errors=True)
         return jsonify({'error': str(e)}), 500
@@ -110,13 +105,11 @@ def youtube_video():
             ydl.download([url])
             info = ydl.extract_info(url, download=False)
             title = info.get('title', 'video')
-        
         final_file = None
         for f in os.listdir(temp_dir):
-            if f.startswith(f'video_{unique_id}'):
+            if f.startswith(f'video_{unique_id}') and f.endswith('.mp4'):
                 final_file = os.path.join(temp_dir, f)
                 break
-        
         if final_file and os.path.exists(final_file) and os.path.getsize(final_file) > 0:
             @after_this_request
             def cleanup(response):
@@ -124,7 +117,7 @@ def youtube_video():
                 if os.path.exists(cookie_file): os.remove(cookie_file)
                 return response
             return send_file(final_file, as_attachment=True, download_name=f"{title}.mp4", mimetype='video/mp4')
-        raise Exception("Download failed or file is empty")
+        raise Exception("Download failed - Check your URL or try again later")
     except Exception as e:
         shutil.rmtree(temp_dir, ignore_errors=True)
         return jsonify({'error': str(e)}), 500
@@ -150,6 +143,9 @@ def tiktok_download():
             return send_file(video_path, as_attachment=True, download_name=f"{title[:50]}.mp4", mimetype='video/mp4')
         return jsonify({'error': 'API error'}), 500
     except Exception as e: return jsonify({'error': str(e)}), 500
+
+@app.route('/health')
+def health(): return jsonify({'status': 'healthy'})
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))

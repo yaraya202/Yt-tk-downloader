@@ -8,6 +8,12 @@
 
 <section class="main-section docs-section">
     <div class="doc-card">
+        <h3>Video Information</h3>
+        <div class="endpoint"><code>GET /api/info?url={URL}</code></div>
+        <p>Returns title, thumbnail, and duration for the media.</p>
+    </div>
+
+    <div class="doc-card">
         <h3>YouTube Audio</h3>
         <div class="endpoint"><code>GET /api/youtube/audio?url={URL}</code></div>
         <p>Returns the audio file directly as a download.</p>
@@ -24,5 +30,10 @@
         <div class="endpoint"><code>GET /api/tiktok/download?url={URL}</code></div>
         <p>Returns the TikTok video without watermark.</p>
     </div>
+</section>
+
+<section class="info-section">
+    <h2>Usage Notes</h2>
+    <p>All endpoints return files directly with the appropriate MIME type. Ensure URLs are URL-encoded.</p>
 </section>
 {% endblock %}

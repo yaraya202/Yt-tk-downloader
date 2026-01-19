@@ -118,13 +118,19 @@
             await fetchInfo(url);
             startSmartProgress();
             
-            window.location.href = `${BASE_URL}/api/youtube/audio?url=${encodeURIComponent(url)}`;
-            // Show close button after delay since download start is hard to track perfectly via window.location
+            const downloadUrl = `${BASE_URL}/api/youtube/audio?url=${encodeURIComponent(url)}`;
+            const iframe = document.createElement('iframe');
+            iframe.style.display = 'none';
+            iframe.src = downloadUrl;
+            document.body.appendChild(iframe);
+
+            // Since we can't truly detect the download completion in a browser easily for cross-origin or even same-origin file downloads via iframe
+            // we stop the animation after a safe buffer or when the user closes it.
             setTimeout(() => {
                 document.getElementById('status-text').innerText = "Download Started!";
                 updateProgress(100);
                 document.getElementById('close-btn').classList.remove('hidden');
-            }, 10000);
+            }, 8000);
         }
 
         async function downloadYouTubeVideo() {
@@ -134,12 +140,17 @@
             await fetchInfo(url);
             startSmartProgress();
             
-            window.location.href = `${BASE_URL}/api/youtube/video?url=${encodeURIComponent(url)}`;
+            const downloadUrl = `${BASE_URL}/api/youtube/video?url=${encodeURIComponent(url)}`;
+            const iframe = document.createElement('iframe');
+            iframe.style.display = 'none';
+            iframe.src = downloadUrl;
+            document.body.appendChild(iframe);
+
             setTimeout(() => {
                 document.getElementById('status-text').innerText = "Download Started!";
                 updateProgress(100);
                 document.getElementById('close-btn').classList.remove('hidden');
-            }, 15000);
+            }, 12000);
         }
 
         async function downloadTikTok() {
@@ -149,12 +160,17 @@
             await fetchInfo(url);
             startSmartProgress();
             
-            window.location.href = `${BASE_URL}/api/tiktok/download?url=${encodeURIComponent(url)}`;
+            const downloadUrl = `${BASE_URL}/api/tiktok/download?url=${encodeURIComponent(url)}`;
+            const iframe = document.createElement('iframe');
+            iframe.style.display = 'none';
+            iframe.src = downloadUrl;
+            document.body.appendChild(iframe);
+
             setTimeout(() => {
                 document.getElementById('status-text').innerText = "Download Started!";
                 updateProgress(100);
                 document.getElementById('close-btn').classList.remove('hidden');
-            }, 8000);
+            }, 6000);
         }
     </script>
 </body>

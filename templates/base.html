@@ -69,24 +69,52 @@
             const url = document.getElementById('youtube-url').value;
             if (!url) return alert('Please enter URL');
             showLoading("Downloading Audio...");
-            window.location.href = `${BASE_URL}/api/youtube/audio?url=${encodeURIComponent(url)}`;
-            setTimeout(closeModal, 10000);
+            
+            const downloadUrl = `${BASE_URL}/api/youtube/audio?url=${encodeURIComponent(url)}`;
+            const iframe = document.createElement('iframe');
+            iframe.style.display = 'none';
+            iframe.src = downloadUrl;
+            document.body.appendChild(iframe);
+            
+            // Close modal after a reasonable time as we can't easily detect download start in a cross-origin friendly way without complex headers
+            setTimeout(() => {
+                closeModal();
+                document.body.removeChild(iframe);
+            }, 15000);
         }
 
         async function downloadYouTubeVideo() {
             const url = document.getElementById('youtube-url').value;
             if (!url) return alert('Please enter URL');
             showLoading("Downloading Video...");
-            window.location.href = `${BASE_URL}/api/youtube/video?url=${encodeURIComponent(url)}`;
-            setTimeout(closeModal, 10000);
+            
+            const downloadUrl = `${BASE_URL}/api/youtube/video?url=${encodeURIComponent(url)}`;
+            const iframe = document.createElement('iframe');
+            iframe.style.display = 'none';
+            iframe.src = downloadUrl;
+            document.body.appendChild(iframe);
+            
+            setTimeout(() => {
+                closeModal();
+                document.body.removeChild(iframe);
+            }, 20000);
         }
 
         async function downloadTikTok() {
             const url = document.getElementById('tiktok-url').value;
             if (!url) return alert('Please enter URL');
             showLoading("Downloading TikTok...");
-            window.location.href = `${BASE_URL}/api/tiktok/download?url=${encodeURIComponent(url)}`;
-            setTimeout(closeModal, 10000);
+            
+            const downloadUrl = `${BASE_URL}/api/tiktok/download?url=${encodeURIComponent(url)}`;
+            const iframe = document.createElement('iframe');
+            iframe.style.display = 'none';
+            iframe.src = downloadUrl;
+            document.body.appendChild(iframe);
+            
+            setTimeout(() => {
+                closeModal();
+                document.body.removeChild(iframe);
+            }, 10000);
         }
     </script>
 </body>

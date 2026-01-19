@@ -1,165 +1,30 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <!-- SEO Tags -->
-    <title>ProDownloader - YouTube & TikTok Video Downloader API</title>
-    <meta name="description" content="High-quality YouTube MP3/MP4 and TikTok video downloader. Fast, free, and easy to use API for developers.">
-    <meta name="keywords" content="youtube downloader, tiktok downloader, mp3 downloader, video api, media downloader">
-    <meta name="author" content="ProDownloader">
-    <link rel="stylesheet" href="/static/style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-</head>
-<body>
-    <nav class="navbar">
-        <div class="nav-container">
-            <a href="#" class="logo"><i class="fas fa-download"></i> ProDownloader</a>
-            <ul class="nav-links">
-                <li><a href="#youtube">YouTube</a></li>
-                <li><a href="#tiktok">TikTok</a></li>
-                <li><a href="#docs">API Docs</a></li>
-            </ul>
-        </div>
-    </nav>
+{% extends "base.html" %}
+{% block content %}
+<section class="hero">
+    <h1>Audio Video Downloader</h1>
+    <p>Professional tool to download high-quality content from YouTube and TikTok instantly.</p>
+</section>
 
-    <div class="container">
-        <!-- Hero Section -->
-        <header class="hero">
-            <h1>Professional Media Downloader</h1>
-            <p>Download high-quality content from YouTube and TikTok instantly.</p>
-        </header>
+<div class="features-grid">
+    <a href="/youtube" class="feature-card">
+        <i class="fab fa-youtube"></i>
+        <h3>YouTube Downloader</h3>
+        <p>Download MP3 & MP4 in best quality.</p>
+    </a>
+    <a href="/tiktok" class="feature-card">
+        <i class="fab fa-tiktok"></i>
+        <h3>TikTok Downloader</h3>
+        <p>Save videos without watermark.</p>
+    </a>
+    <a href="/api-docs" class="feature-card">
+        <i class="fas fa-code"></i>
+        <h3>Developer API</h3>
+        <p>Fast and easy to use media API.</p>
+    </a>
+</div>
 
-        <!-- YouTube Section -->
-        <section id="youtube" class="main-section">
-            <div class="section-header">
-                <i class="fab fa-youtube"></i>
-                <h2>YouTube Downloader</h2>
-            </div>
-            <div class="test-form">
-                <input type="text" id="youtube-url" placeholder="Paste YouTube URL here..." value="https://youtu.be/Qo4IOTAbGAM?si=yvVvCQnX7eTLPsGx">
-                <div class="options-grid">
-                    <div class="option-item">
-                        <label>Audio Quality</label>
-                        <select id="audio-quality">
-                            <option value="64">64 kbps (Fast)</option>
-                            <option value="128">128 kbps (Standard)</option>
-                            <option value="192">192 kbps (High)</option>
-                            <option value="320">320 kbps (Ultra)</option>
-                        </select>
-                    </div>
-                    <div class="option-item">
-                        <label>Video Quality</label>
-                        <select id="video-quality">
-                            <option value="360">360p (Small)</option>
-                            <option value="720">720p (HD)</option>
-                            <option value="best" selected>Best Available</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="btn-group">
-                    <button class="btn btn-red" onclick="downloadYouTubeAudio()"><i class="fas fa-music"></i> MP3 Audio</button>
-                    <button class="btn btn-blue" onclick="downloadYouTubeVideo()"><i class="fas fa-video"></i> MP4 Video</button>
-                </div>
-            </div>
-        </section>
-
-        <!-- TikTok Section -->
-        <section id="tiktok" class="main-section">
-            <div class="section-header">
-                <i class="fab fa-tiktok"></i>
-                <h2>TikTok Downloader</h2>
-            </div>
-            <div class="test-form">
-                <input type="text" id="tiktok-url" placeholder="Paste TikTok URL here..." value="https://vt.tiktok.com/ZSfwk7dhv/">
-                <div class="btn-group">
-                    <button class="btn btn-dark" onclick="downloadTikTok()"><i class="fas fa-download"></i> Download Video</button>
-                </div>
-            </div>
-        </section>
-
-        <!-- API Documentation Section -->
-        <section id="docs" class="main-section docs-section">
-            <div class="section-header">
-                <i class="fas fa-code"></i>
-                <h2>API Documentation</h2>
-            </div>
-            
-            <div class="doc-card">
-                <h3>YouTube Audio</h3>
-                <div class="endpoint"><code>GET /api/youtube/audio?url={URL}&quality={64-320}</code></div>
-                <p>Returns the audio file directly as a download.</p>
-            </div>
-
-            <div class="doc-card">
-                <h3>YouTube Video</h3>
-                <div class="endpoint"><code>GET /api/youtube/video?url={URL}&quality={360|720|best}</code></div>
-                <p>Returns the video file directly as a download.</p>
-            </div>
-
-            <div class="doc-card">
-                <h3>TikTok Download</h3>
-                <div class="endpoint"><code>GET /api/tiktok/download?url={URL}</code></div>
-                <p>Returns the TikTok video without watermark.</p>
-            </div>
-        </section>
-
-        <div id="result-overlay" class="overlay hidden">
-            <div class="modal">
-                <div id="loader" class="loader"></div>
-                <div id="status-text">Processing...</div>
-                <button class="btn btn-close" onclick="closeModal()">Close</button>
-            </div>
-        </div>
-
-        <footer>
-            <p>&copy; 2026 ProDownloader API. All rights reserved.</p>
-            <div class="social-links">
-                <i class="fab fa-github"></i>
-                <i class="fab fa-twitter"></i>
-            </div>
-        </footer>
-    </div>
-
-    <script>
-        const BASE_URL = window.location.origin;
-
-        function showLoading(text = "Processing...") {
-            document.getElementById('result-overlay').classList.remove('hidden');
-            document.getElementById('status-text').innerText = text;
-            document.getElementById('loader').style.display = 'block';
-        }
-
-        function closeModal() {
-            document.getElementById('result-overlay').classList.add('hidden');
-        }
-
-        async function downloadYouTubeAudio() {
-            const url = document.getElementById('youtube-url').value;
-            const quality = document.getElementById('audio-quality').value;
-            if (!url) return alert('Please enter URL');
-            showLoading("Downloading Audio...");
-            window.location.href = `${BASE_URL}/api/youtube/audio?url=${encodeURIComponent(url)}&quality=${quality}`;
-            setTimeout(closeModal, 5000);
-        }
-
-        async function downloadYouTubeVideo() {
-            const url = document.getElementById('youtube-url').value;
-            const quality = document.getElementById('video-quality').value;
-            if (!url) return alert('Please enter URL');
-            showLoading("Downloading Video...");
-            window.location.href = `${BASE_URL}/api/youtube/video?url=${encodeURIComponent(url)}&quality=${quality}`;
-            setTimeout(closeModal, 5000);
-        }
-
-        async function downloadTikTok() {
-            const url = document.getElementById('tiktok-url').value;
-            if (!url) return alert('Please enter URL');
-            showLoading("Downloading TikTok...");
-            window.location.href = `${BASE_URL}/api/tiktok/download?url=${encodeURIComponent(url)}`;
-            setTimeout(closeModal, 5000);
-        }
-    </script>
-</body>
-</html>
+<section class="intro-section">
+    <h2>Why Choose Audio Video Downloader?</h2>
+    <p>We provide the fastest and most reliable service for downloading your favorite media. Our platform is optimized for both mobile and desktop, ensuring a seamless experience everywhere.</p>
+</section>
+{% endblock %}

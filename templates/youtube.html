@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}YouTube Video Downloader - Audio Video Downloader{% endblock %}
+{% block content %}
+<section class="hero">
+    <h1>YouTube Video Downloader</h1>
+    <p>Download YouTube videos in high quality (MP4) or extract audio (MP3) instantly.</p>
+</section>
+
+<section class="main-section">
+    <div class="test-form">
+        <input type="text" id="youtube-url" placeholder="Paste YouTube URL here..." value="https://youtu.be/Qo4IOTAbGAM?si=lvlKcJ2aZTtC2CGA">
+        <div class="options-grid">
+            <div class="option-item">
+                <label>Audio Quality</label>
+                <select id="audio-quality">
+                    <option value="128">128 kbps (Standard)</option>
+                    <option value="192">192 kbps (High)</option>
+                    <option value="320">320 kbps (Ultra)</option>
+                </select>
+            </div>
+            <div class="option-item">
+                <label>Video Quality</label>
+                <select id="video-quality">
+                    <option value="360">360p</option>
+                    <option value="720">720p (HD)</option>
+                    <option value="best" selected>Best Available</option>
+                </select>
+            </div>
+        </div>
+        <div class="btn-group">
+            <button class="btn btn-red" onclick="downloadYouTubeAudio()"><i class="fas fa-music"></i> Download MP3</button>
+            <button class="btn btn-blue" onclick="downloadYouTubeVideo()"><i class="fas fa-video"></i> Download MP4</button>
+        </div>
+    </div>
+</section>
+
+<section class="info-section">
+    <h2>Why use our YouTube Downloader?</h2>
+    <ul>
+        <li><i class="fas fa-bolt"></i> <strong>Fast & Easy:</strong> Just paste the link and download.</li>
+        <li><i class="fas fa-check-circle"></i> <strong>High Quality:</strong> Supports up to 4K resolution.</li>
+        <li><i class="fas fa-lock"></i> <strong>Safe & Secure:</strong> No registration required.</li>
+    </ul>
+</section>
+{% endblock %}

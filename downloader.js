@@ -1,6 +1,6 @@
-const { YouTubeMusic } = require('@mks2508/yt-dl');
-const fs = require('fs');
-const path = require('path');
+import { YouTubeMusic } from '@mks2508/yt-dl';
+import fs from 'fs';
+import path from 'path';
 
 async function download() {
     const args = process.argv.slice(2);
@@ -22,7 +22,6 @@ async function download() {
 
         if (result.success) {
             const downloadedFile = result.data.filePath;
-            // Move/Rename to expected outputPath if different
             if (path.resolve(downloadedFile) !== path.resolve(outputPath)) {
                 fs.renameSync(downloadedFile, outputPath);
             }

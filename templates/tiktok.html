@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}TikTok Video Downloader - No Watermark - Audio Video Downloader{% endblock %}
+{% block content %}
+<section class="hero">
+    <h1>TikTok Video Downloader</h1>
+    <p>Download TikTok videos without watermark for free.</p>
+</section>
+
+<section class="main-section">
+    <div class="test-form">
+        <input type="text" id="tiktok-url" placeholder="Paste TikTok URL here..." value="https://vt.tiktok.com/ZSfwk7dhv/">
+        <div class="btn-group">
+            <button class="btn btn-dark" onclick="downloadTikTok()"><i class="fas fa-download"></i> Download Video (No Watermark)</button>
+        </div>
+    </div>
+</section>
+
+<section class="info-section">
+    <h2>Best TikTok Downloader</h2>
+    <p>Our tool allows you to save any TikTok video without the annoying watermark. Perfect for creators and fans alike.</p>
+</section>
+{% endblock %}

@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Media Downloader API Documentation - Audio Video Downloader{% endblock %}
+{% block content %}
+<section class="hero">
+    <h1>API Documentation</h1>
+    <p>Integrate our powerful media downloading capabilities into your own applications.</p>
+</section>
+
+<section class="main-section docs-section">
+    <div class="doc-card">
+        <h3>YouTube Audio</h3>
+        <div class="endpoint"><code>GET /api/youtube/audio?url={URL}</code></div>
+        <p>Returns the audio file directly as a download.</p>
+    </div>
+
+    <div class="doc-card">
+        <h3>YouTube Video</h3>
+        <div class="endpoint"><code>GET /api/youtube/video?url={URL}</code></div>
+        <p>Returns the video file directly as a download.</p>
+    </div>
+
+    <div class="doc-card">
+        <h3>TikTok Download</h3>
+        <div class="endpoint"><code>GET /api/tiktok/download?url={URL}</code></div>
+        <p>Returns the TikTok video without watermark.</p>
+    </div>
+</section>
+{% endblock %}

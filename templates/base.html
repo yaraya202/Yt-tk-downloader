@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Audio Video Downloader - Free YouTube & TikTok Downloader{% endblock %}</title>
+    <meta name="description" content="Audio Video Downloader is a free tool to download YouTube videos, MP3 audio, and TikTok videos without watermark in high quality.">
+    <meta name="keywords" content="youtube downloader, tiktok downloader, mp3 downloader, video downloader, no watermark, free online downloader">
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="logo"><i class="fas fa-download"></i> AV Downloader</a>
+            <div class="menu-toggle" id="mobile-menu">
+                <i class="fas fa-bars"></i>
+            </div>
+            <ul class="nav-links" id="nav-list">
+                <li><a href="/youtube">YouTube</a></li>
+                <li><a href="/tiktok">TikTok</a></li>
+                <li><a href="/api-docs">API Docs</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        {% block content %}{% endblock %}
+    </div>
+
+    <footer>
+        <p>&copy; 2026 Audio Video Downloader. All rights reserved.</p>
+    </footer>
+
+    <div id="result-overlay" class="overlay hidden">
+        <div class="modal">
+            <div id="loader" class="loader"></div>
+            <div id="status-text">Processing...</div>
+            <button class="btn btn-close" onclick="closeModal()">Close</button>
+        </div>
+    </div>
+
+    <script>
+        const BASE_URL = window.location.origin;
+
+        // Mobile Menu Toggle
+        document.getElementById('mobile-menu').addEventListener('click', function() {
+            document.getElementById('nav-list').classList.toggle('active');
+        });
+
+        function showLoading(text = "Processing...") {
+            document.getElementById('result-overlay').classList.remove('hidden');
+            document.getElementById('status-text').innerText = text;
+            document.getElementById('loader').style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('result-overlay').classList.add('hidden');
+        }
+
+        async function downloadYouTubeAudio() {
+            const url = document.getElementById('youtube-url').value;
+            if (!url) return alert('Please enter URL');
+            showLoading("Downloading Audio...");
+            window.location.href = `${BASE_URL}/api/youtube/audio?url=${encodeURIComponent(url)}`;
+            setTimeout(closeModal, 10000);
+        }
+
+        async function downloadYouTubeVideo() {
+            const url = document.getElementById('youtube-url').value;
+            if (!url) return alert('Please enter URL');
+            showLoading("Downloading Video...");
+            window.location.href = `${BASE_URL}/api/youtube/video?url=${encodeURIComponent(url)}`;
+            setTimeout(closeModal, 10000);
+        }
+
+        async function downloadTikTok() {
+            const url = document.getElementById('tiktok-url').value;
+            if (!url) return alert('Please enter URL');
+            showLoading("Downloading TikTok...");
+            window.location.href = `${BASE_URL}/api/tiktok/download?url=${encodeURIComponent(url)}`;
+            setTimeout(closeModal, 10000);
+        }
+    </script>
+</body>
+</html>

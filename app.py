@@ -10,14 +10,13 @@ app = Flask(__name__)
 
 def run_node_downloader(url, type, output_path):
     try:
-        # Ensure directory exists
         os.makedirs(os.path.dirname(output_path), exist_ok=True)
-        
+        # We need to run it as a module since we changed type to module
         result = subprocess.run(
             ['node', 'downloader.js', url, type, output_path],
             capture_output=True,
             text=True,
-            timeout=300 # Increased timeout for larger videos
+            timeout=300
         )
         print("Stdout:", result.stdout)
         print("Stderr:", result.stderr)
@@ -31,6 +30,18 @@ def run_node_downloader(url, type, output_path):
 @app.route('/')
 def index():
     return render_template('index.html')
+
+@app.route('/youtube')
+def youtube_page():
+    return render_template('youtube.html')
+
+@app.route('/tiktok')
+def tiktok_page():
+    return render_template('tiktok.html')
+
+@app.route('/api-docs')
+def api_docs():
+    return render_template('api.html')
 
 @app.route('/api/youtube/audio')
 def youtube_audio():

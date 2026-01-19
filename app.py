@@ -56,18 +56,32 @@ def get_info():
     
     # Simple YouTube Info extractor using yt-dlp
     try:
+        # Check if it's a shorts URL and normalize it
+        normalized_url = url
+        if 'youtube.com/shorts/' in url:
+            video_id = url.split('/shorts/')[1].split('?')[0]
+            normalized_url = f"https://www.youtube.com/watch?v={video_id}"
+
         result = subprocess.run(
-            ['python3', '-m', 'yt_dlp', '--dump-json', '--no-playlist', url],
+            ['python3', '-m', 'yt_dlp', '--dump-json', '--no-playlist', '--no-check-certificate', normalized_url],
             capture_output=True, text=True, timeout=30
         )
         if result.returncode == 0:
             import json
             data = json.loads(result.stdout)
+            thumbnail = data.get('thumbnail')
+            # If thumbnail is a .webp or has issues, we can try to get the maxresdefault
+            video_id = data.get('id')
+            if video_id and (not thumbnail or '.webp' in thumbnail):
+                thumbnail = f"https://img.youtube.com/vi/{video_id}/maxresdefault.jpg"
+            
             return jsonify({
                 'title': data.get('title'),
-                'thumbnail': data.get('thumbnail'),
+                'thumbnail': thumbnail,
                 'duration': data.get('duration_string')
             })
+        else:
+            print(f"yt-dlp error: {result.stderr}")
     except Exception as e:
         print(f"Info Error: {e}")
         

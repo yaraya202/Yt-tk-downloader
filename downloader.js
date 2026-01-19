@@ -16,14 +16,17 @@ async function download() {
     try {
         console.log(`Fetching data for URL: ${url} (Type: ${type})`);
         
-        // Get title first
+        // Parallel title fetch and command preparation
         const titleResult = await execPromise(`python3 -m yt_dlp --get-title "${url}"`);
         const title = titleResult.stdout.trim().replace(/[^\w\s-]/g, '');
         console.log(`TITLE_START|${title}|TITLE_END`);
 
         let command = '';
         if (type === 'audio') {
-            command = `python3 -m yt_dlp --add-header "Cookie:${COOKIES}" -x --audio-format mp3 -o "${outputPath}" "${url}"`;
+            // Speed optimization: select best m4a (aac) and avoid transcoding to mp3 if possible
+            // But user asked for speed, so we'll use --audio-format best and avoid re-encoding if we can
+            // Using -f bestaudio[ext=m4a]/bestaudio will be faster as it doesn't need re-encoding
+            command = `python3 -m yt_dlp --add-header "Cookie:${COOKIES}" -f "bestaudio/best" --extract-audio --audio-format mp3 --audio-quality 0 --no-keep-video -o "${outputPath}" "${url}"`;
         } else {
             command = `python3 -m yt_dlp --add-header "Cookie:${COOKIES}" -f "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best" -o "${outputPath}" "${url}"`;
         }

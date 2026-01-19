@@ -66,7 +66,7 @@ def get_info():
         COOKIES = os.environ.get('YT_COOKIES', "")
 
         result = subprocess.run(
-            ['python3', '-m', 'yt_dlp', '--add-header', f"Cookie:{COOKIES}", '--dump-json', '--no-playlist', '--no-check-certificate', normalized_url],
+            ['python3', '-m', 'yt_dlp', '--add-header', f"Cookie:{COOKIES}", '--dump-json', '--no-playlist', '--no-check-certificate', '--proxy', '', normalized_url],
             capture_output=True, text=True, timeout=30
         )
         if result.returncode == 0:

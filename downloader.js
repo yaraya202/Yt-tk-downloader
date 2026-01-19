@@ -23,9 +23,9 @@ async function download() {
 
         let command = '';
         if (type === 'audio') {
-            command = `python3 -m yt_dlp --add-header "Cookie:${COOKIES}" --no-playlist --no-check-certificate -x --audio-format mp3 -o "${outputPath}" "${url}"`;
+            command = `python3 -m yt_dlp --add-header "Cookie:${COOKIES}" --no-playlist --no-check-certificate -x --audio-format mp3 -o "${outputPath}" --proxy "" "${url}"`;
         } else {
-            command = `python3 -m yt_dlp --add-header "Cookie:${COOKIES}" --no-playlist --no-check-certificate -f "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best" -o "${outputPath}" "${url}"`;
+            command = `python3 -m yt_dlp --add-header "Cookie:${COOKIES}" --no-playlist --no-check-certificate -f "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best" -o "${outputPath}" --proxy "" "${url}"`;
         }
 
         console.log(`Executing: ${command}`);
